@@ -58,11 +58,11 @@ case class HMMPrediction(likelihood: Double, states: Array[Int]) {
 		 * @version 0.99.1
 		 * @see Scala for Machine Learning Chapter 7 ''Sequential data models'' / Hidden Markov Model
 		 */
-final protected class HMMModel(
+class HMMModel(
 		val A: DMatrix, 
 		val B: DMatrix, 
 		var pi: DblArray, 
-		val numObs: Int) {
+		val numObs: Int) extends Serializable {
 	
 		/**
 		 * Retrieve the number of states for a sequence of observations
