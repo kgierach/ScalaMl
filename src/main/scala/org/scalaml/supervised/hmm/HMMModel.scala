@@ -184,7 +184,30 @@ class HMMModel(
 		val sum = pi.sum
 		pi = pi.map( _ /sum)
 	}
+
   
+                /**
+                 * Combine another HMM with this HMM.
+                 */
+        def combine( hmm : HMMModel, weight : Double ) : Unit = {
+          
+          for( i <- 0 to (pi.length - 1) ) {
+              pi(i) += weight * hmm.pi(i)
+          }
+
+          for( i <- 0 to (A.nRows - 1) ) {
+            for( j <- 0 to (A.nCols - 1)  ) {
+              A.update( i, j, A.apply(i,j) +  (weight * hmm.A.apply(i, j)))
+            }
+          }
+
+          for( i <- 0 to (B.nRows - 1) ) {
+            for( j <- 0 to (B.nCols - 1) ) {
+              B.update(i, j, B.apply(i,j) +  (weight * hmm.B.apply(i, j)))
+            }
+          }     
+        }
+
 		/**
 		 * Textual representation of the Lambda (A, B, pi) model.
 		 */
@@ -192,7 +215,53 @@ class HMMModel(
 		val piStr = pi.map(x => s"${format(x, emptyString, SHORT)}").mkString(", ")
 		s"State transition A\n${A.toString}\nEmission B\n${B.toString}\nInitial pi\n$piStr"
 	}
- 
+
+
+        /**
+         * convert model to json representation
+         */
+        def toJSON() : String = {
+          var sb = new StringBuffer();
+
+          sb.append( "{ " );
+          sb.append( "sigmaSize: " + this.numSymbols + "," );
+          sb.append( " pi: [ ");
+          for( i <- 0 to (pi.length - 1) ) {
+              sb.append( pi(i) );            
+              if( i != (pi.length - 1) ) {
+                sb.append( "," );
+              }
+          }
+          sb.append( " ], " );
+
+          sb.append( "a: [ " );              
+          for( i <- 0 to (A.nRows - 1) ) {
+            for( j <- 0 to (A.nCols - 1) ) {
+              sb.append( A.apply(i,j) );
+              if(! (i == (A.nRows-1) && j == (A.nCols-1)) ) {
+                sb.append( "," );
+              }                
+            }
+          }
+          sb.append( " ], " );
+
+          sb.append( "b: [ " );
+          for( i <- 0 to (B.nRows - 1) ) {
+            for( j <- 0 to (B.nCols - 1) ) {
+              sb.append(  B.apply(i,j) );
+              if(! (i == (B.nRows-1) && j == (B.nCols-1)) ) {
+                sb.append( "," );
+              }
+            }
+          }
+          sb.append( " ] " );
+
+          sb.append( " }" );
+
+          return sb.toString();
+        }
+
+
 		/*
 		 * Compute alpha for the observation t = 0. (Formula M1)
 		 */
