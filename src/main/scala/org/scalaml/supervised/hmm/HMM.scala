@@ -175,8 +175,8 @@ object HMM {
 			form: HMMForm)
 			(implicit quantize: Array[T] => Int, f: T => Double): HMM[T] = 
 		new HMM[T](config, xt, form)
-	  
-	 
+
+
 		/**
 		 * Implements the 3rd canonical form 'decoding' of the HMM
 		 * @tparam T Type of observed states

@@ -40,7 +40,7 @@ import HMMConfig._
 		 * @see Scala for Machine Learning Chapter 7 Sequential data models / Hidden Markov Model 
 		 * - Evaluation
 		 */
-final protected class Alpha(lambda: HMMModel, obsSeq: Vector[Int]) 
+final protected class Alpha(lambda: HMMModel, obsSeq: Vector[Int], doNormalize : Boolean  ) 
 		extends HMMTreillis(lambda.numObs, lambda.numStates) {
 
 
@@ -52,7 +52,9 @@ final protected class Alpha(lambda: HMMModel, obsSeq: Vector[Int])
 	 */
 	val alpha: Double = Try { 
 		treillis = lambda.setAlpha(obsSeq)
-		normalize(0)
+                if( doNormalize ) {
+                  normalize(0)
+                }
 		sumUp
 	}.getOrElse(Double.NaN)
 
@@ -74,10 +76,17 @@ final protected class Alpha(lambda: HMMModel, obsSeq: Vector[Int])
 			 */
 	private def sumUp: Double = {	 
 		foreach(1, lambda.numObs, t => {
+                        // println( "sumUp t: " + t )
 			updateAlpha(t)		// Implements first equation of M3
-			normalize(t)			// Normalized wit the sum of alpha(i), t 0 -> N-1
+                        if( doNormalize ) {
+                          normalize(t)	        // Normalized wit the sum of alpha(i), t 0 -> N-1
+                        }
 		})
-		/:(lambda.numStates, (s, k) => s + treillis(lambda.numObs-1, k))
+		/:(lambda.numStates, {                    
+                    (s, k) => 
+                      // println( "sumUp s: " + s + ", k=" + k )
+                      s + treillis( lambda.numObs-1, k )             
+                })
 	}
 
 		/*
@@ -106,7 +115,10 @@ object Alpha {
 		 * matrix.
 		 * @param obsSeq Array of observations as integer (categorical data
 		 */
-	def apply(lambda: HMMModel, obsSeq: Vector[Int]): Alpha = new Alpha(lambda,obsSeq)
+	def apply(lambda: HMMModel, obsSeq: Vector[Int]): Alpha = new Alpha(lambda,obsSeq, true)
+        
+  
+        def apply(lambda: HMMModel, obsSeq: Vector[Int], doNormalize : Boolean ): Alpha = new Alpha(lambda,obsSeq, doNormalize)
 }
 
 

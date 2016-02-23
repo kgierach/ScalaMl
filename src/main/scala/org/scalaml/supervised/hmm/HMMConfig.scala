@@ -46,7 +46,12 @@ case class HMMConfig(
 		eps: Double) extends Config {
 	import HMMConfig._
 	
-	check(numObs, numStates, numObs, maxIters, eps)
+	check(numObs, numStates, numSymbols, maxIters, eps)
+        
+  var pi_init : Array[Double] = null
+  
+  def getInitialPI() : Array[Double] = pi_init
+  
 }
 
 

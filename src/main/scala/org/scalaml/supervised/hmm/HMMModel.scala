@@ -62,7 +62,7 @@ class HMMModel(
 		val A: DMatrix, 
 		val B: DMatrix, 
 		var pi: DblArray, 
-		val numObs: Int) extends Serializable {
+		var numObs: Int ) extends Serializable {
 	
 		/**
 		 * Retrieve the number of states for a sequence of observations
@@ -108,7 +108,7 @@ class HMMModel(
 				s"HMMModel.alpha Observation $obsId is out of bounds")
   	  	 
 		val sum = /:(numStates, (s, n) => s + a *A(i, n))
-		sum*B(i, obsId) 
+		sum*B(i, obsId)
 	}
 
 		/**
@@ -131,9 +131,21 @@ class HMMModel(
 		 * @param obsId Index of the observation
 		 * @return Update beta value
 		 */
-	final def getBetaVal(b: Double, i: Int, obsId: Int): Double =  
-		/:(numStates, (s, k) => s + b*A(i,k)*B(k, obsId))
-
+	final def getBetaVal(b: Double, i: Int, obsId: Int): Double = {
+          var ret : Double = 0
+          
+          //println( "getBetaVal: obsId: " + obsId + ", i: " + i + ", numStates: " + numStates )
+          
+	  ret = /:(numStates, (s, k) => {
+            // println( "s: " + s + ", k: " + k )
+            var a_val = A(i,k)
+            var b_val = B( k, obsId )
+            s + b * a_val * b_val
+          })
+          
+          ret
+        }
+        
 		/**
 		 * Compute a new estimate of the log of the conditional probabilities for a given
 		 * iteration. Arithmetic exception are caught by client code.
@@ -323,7 +335,11 @@ object HMMModel {
 	def apply(config: HMMConfig): HMMModel = {
 		 val A = DMatrix(config.numStates, config.numStates, 0.0)
 		 val B = DMatrix(config.numStates, config.numSymbols, 0.0)
-		 val pi = Array.fill(config.numStates)(Random.nextDouble())
+		 var pi = Array.fill(config.numStates)(Random.nextDouble())
+                 if( config.pi_init != null ) {
+                   println( "HMMModel: using user-specified pi" )
+                   pi = config.pi_init
+                 }
 		 
 		 new HMMModel(A, B, pi, config.numObs)
 	}

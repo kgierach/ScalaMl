@@ -21,7 +21,7 @@ import org.scalaml.core.Types.ScalaMl._
 
 import scala.annotation.implicitNotFound
 import scala.util.Random
-
+import java.io.Serializable
 
 
 	/**
@@ -47,7 +47,7 @@ object MathUtils {
 	class DMatrix(
 			val nRows: Int, 
 			val nCols: Int, 
-			val data: DblArray) {
+			val data: DblArray) extends Serializable {
 	  
 		import DMatrix._
 		check(nRows, nCols, data)

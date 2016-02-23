@@ -57,6 +57,7 @@ protected class Beta(lambda: HMMModel, obsSeq: Vector[Int])
 			 * @see Chapter 7 Sequential Data Models / Hidden Markov model / Evaluation / Beta pass
 			 */
 	val initialized: Boolean = Try {
+          try {
 				// Creates the matrix of probabilities of a state given the 
 				// observations, and initialize the probability for the last observation 
 				// (index T-1) as 1.0
@@ -66,6 +67,13 @@ protected class Beta(lambda: HMMModel, obsSeq: Vector[Int])
 		normalize(lambda.numObs-1)
 				// Compute the beta probabilities for all the observations.
 		sumUp()
+          } catch {
+             case e : Exception => {
+               println( "Beta: Exception Caught: numObs: " + lambda.numObs + ", numStates: " + lambda.numStates )
+               println( "Beta:     obsSeq: " + obsSeq.length )
+               e.printStackTrace()
+             }
+          }
 	}._toBoolean("Beta.complete failed")
 	
 	@inline
@@ -79,9 +87,10 @@ protected class Beta(lambda: HMMModel, obsSeq: Vector[Int])
 	private def sumUp(): Unit =
 			// Update and normalize the beta probabilities for all 
 			// the observations starting with index T-2.. before normalization.
-		(lambda.numObs-2 to 0 by -1).foreach( t =>{
-			updateBeta(t)
-			normalize(t) 
+		(lambda.numObs-2 to 0 by -1).foreach( t => {
+                    // println( "sumUp: t: " + t )
+                    updateBeta(t)
+                    normalize(t) 
 		})
 	
 	
@@ -89,11 +98,15 @@ protected class Beta(lambda: HMMModel, obsSeq: Vector[Int])
 		 * Implements the update of beta(t) from beta(t+1) for all the states using 
 		 * the transition probabilities A and the emission matrix B
 		 */
-	private def updateBeta(t: Int): Unit =
-		foreach(lambda.numStates, i =>
-				treillis += (t, i, lambda.getBetaVal(treillis(t+1, i), i, obsSeq(t+1))))
-}
+	private def updateBeta(t: Int): Unit = {
+		foreach( lambda.numStates, { i => 
+                                //println( "ub: i= " + i + ", t=" + t )
+                                //println( "  treillis: " + treillis(t+1, i) + ", observation=" + obsSeq(t+1) )
+				treillis += (t, i, lambda.getBetaVal(treillis(t+1, i), i, obsSeq(t+1)) ) 
+                              })
+        }
 
+     }
 
 		/**
 		 * Companion object for the Beta pass that defines the constructor apply
