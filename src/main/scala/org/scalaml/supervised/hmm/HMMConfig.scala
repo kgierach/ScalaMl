@@ -18,6 +18,7 @@
 package org.scalaml.supervised.hmm
 
 import org.scalaml.core.Design.Config
+import org.scalaml.util.MathUtils.DMatrix
 
 
 		/**
@@ -49,9 +50,13 @@ case class HMMConfig(
 	check(numObs, numStates, numSymbols, maxIters, eps)
         
   var pi_init : Array[Double] = null
-  
+  var A_init : DMatrix        = null
+  var B_init : DMatrix        = null
+
   def getInitialPI() : Array[Double] = pi_init
-  
+  def getInitialA() : DMatrix = A_init
+  def getInitialB() : DMatrix = B_init
+
 }
 
 

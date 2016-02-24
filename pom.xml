@@ -17,6 +17,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <!--
+        <scalaVersion>2.10.5</scalaVersion>
+        <scalaBinaryVersion>2.10.5</scalaBinaryVersion>
+        -->
         <scalaVersion>2.11.2</scalaVersion>
         <scalaBinaryVersion>2.11.2</scalaBinaryVersion>
       </properties>

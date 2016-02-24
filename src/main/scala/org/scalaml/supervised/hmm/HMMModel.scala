@@ -333,17 +333,22 @@ object HMMModel {
 		 * @return HMMModel insgtance
 		 */
 	def apply(config: HMMConfig): HMMModel = {
-		 val A = DMatrix(config.numStates, config.numStates, 0.0)
-		 val B = DMatrix(config.numStates, config.numSymbols, 0.0)
-		 var pi = Array.fill(config.numStates)(Random.nextDouble())
-                 if( config.pi_init != null ) {
-                   println( "HMMModel: using user-specified pi" )
-                   pi = config.pi_init
-                 }
-		 
-		 new HMMModel(A, B, pi, config.numObs)
-	}
-	
+		var A = DMatrix(config.numStates, config.numStates, 0.0)
+		var B = DMatrix(config.numStates, config.numSymbols, 0.0)
+		var pi = Array.fill(config.numStates)(Random.nextDouble())
+                if( config.pi_init != null ) {
+                  // println( "HMMModel: using user-specified pi" )
+                  pi = config.pi_init
+                }
+                if( config.A_init != null ) {
+                  A = config.A_init
+                }
+                if( config.B_init != null ) {
+                  B = config.B_init
+                }
+		new HMMModel( A, B, pi, config.numObs )
+        }
+
 		/**
 		 * Validate the dimension of the lambda matrices (state transition, emission) and
 		 * the array of initial probabilities
