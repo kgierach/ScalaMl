@@ -232,7 +232,7 @@ class HMMModel(
         /**
          * convert model to json representation
          */
-        def toJSON() : String = {
+        def toJSON( pretty : Boolean ) : String = {
           var sb = new StringBuffer();
 
           sb.append( "{ " );
@@ -246,6 +246,8 @@ class HMMModel(
           }
           sb.append( " ], " );
 
+          if( pretty ) { sb.append( "\n" ) }
+    
           sb.append( "a: [ " );              
           for( i <- 0 to (A.nRows - 1) ) {
             for( j <- 0 to (A.nCols - 1) ) {
@@ -254,8 +256,11 @@ class HMMModel(
                 sb.append( "," );
               }                
             }
+            if( pretty ) { sb.append( "\n" ) }
           }
           sb.append( " ], " );
+
+          if( pretty ) { sb.append( "\n" )}
 
           sb.append( "b: [ " );
           for( i <- 0 to (B.nRows - 1) ) {
@@ -265,6 +270,7 @@ class HMMModel(
                 sb.append( "," );
               }
             }
+            if( pretty ) { sb.append( "\n" ) }            
           }
           sb.append( " ] " );
 
